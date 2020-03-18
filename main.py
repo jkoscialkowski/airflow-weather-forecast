@@ -53,4 +53,7 @@ def prepare_email(cities):
     cities_info = []
     for city in cities:
         cities_info.append(meteo.get_city_info(city))
-    return template.render(cities_info=cities_info)
+
+    mail = template.render(cities_info=cities_info)
+    print(mail)
+    return mail
