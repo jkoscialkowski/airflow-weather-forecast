@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather forecast</title>
+</head>
+<body>
+    <h2>Weather forecast for {{ date }}</h2>
+    {% for city_info in cities_info %}
+        <h3>{{ city_info.cityName }}</h3>
+        <br>
+        <b>Institution:</b> {{ city_info.member.orgName }}
+        <br>
+        <b>Description:</b> {{ city_info.forecast.forecastDay[0].weather }}
+        <br>
+        <b>Min Temperature:</b> {{ city_info.forecast.forecastDay[0].minTemp }}
+        <br>
+        <b>Max Temperature:</b> {{ city_info.forecast.forecastDay[0].maxTemp }}
+    {% endfor %}
+
+    Next forecast tomorrow
+</body>
+</html>
