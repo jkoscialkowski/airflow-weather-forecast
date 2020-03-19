@@ -32,7 +32,7 @@ exit_summary = BashOperator(
     task_id='exit_summary',
     bash_command="""
     echo "Weather forecasts sent to the following adresses:"
-    {% for subscriber in subscribers %}
+    {% for subscriber in params.subscribers %}
         echo "{{ subscriber.email }}"
     {% endfor %}
     """,
