@@ -1,15 +1,12 @@
 import json
 import os
 
-from datetime import timedelta
-
 from airflow.models import DAG
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.email_operator import EmailOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 
-from main import prepare_email
+from main import prepare_forecast, send_forecast
 
 # Declare default arguments and initialize DAG
 args = {
@@ -20,7 +17,7 @@ args = {
 dag = DAG(
     dag_id='weather_forecast',
     default_args=args,
-    schedule_interval=timedelta(days=1)
+    schedule_interval='@daily'
 )
 
 # Load subscribers
@@ -42,10 +39,23 @@ exit_summary = BashOperator(
 
 # Create tasks per subscribers
 for i, subscriber in enumerate(subscribers):
-    send_forecast = PythonOperator(
-        task_id='send_forecast_' + str(i),
-        python_callable=prepare_email,
+    pf = PythonOperator(
+        task_id='prepare_forecast_' + str(i),
+        python_callable=prepare_forecast,
         op_kwargs={'cities': subscriber['cities']},
         dag=dag
     )
-    send_forecast >> exit_summary
+
+    sf = PythonOperator(
+        task_id='send_forecast_' + str(i),
+        provide_context=True,
+        python_callable=send_forecast,
+        op_kwargs={
+            'email': subscriber['email'],
+            'cities': subscriber['cities'],
+            'prev_task_id': 'prepare_forecast_' + str(i)
+        },
+        dag=dag
+    )
+
+    pf >> sf >> exit_summary

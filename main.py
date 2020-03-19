@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import requests
 
+from airflow.utils.email import send_email
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
@@ -50,7 +51,7 @@ env = Environment(
 template = env.get_template('mail_template.html')
 
 
-def prepare_email(cities):
+def prepare_forecast(cities):
     cities_info = []
     for city in cities:
         cities_info.append(meteo.get_city_info(city))
@@ -58,3 +59,13 @@ def prepare_email(cities):
     mail = template.render(cities_info=cities_info)
     print(mail)
     return mail
+
+
+def send_forecast(**kwargs):
+    send_email(
+        to=kwargs['email'],
+        subject="Weather forecast for {}, on {{ ds }}".format(
+            ', '.join(kwargs['cities'])),
+        html_content=kwargs['task_instance'].xcom_pull(
+            task_ids=kwargs['prev_task_id'])
+    )
