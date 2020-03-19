@@ -1,4 +1,5 @@
 import json
+import os
 
 from datetime import timedelta
 
@@ -13,7 +14,7 @@ from main import prepare_email
 # Declare default arguments and initialize DAG
 args = {
     'owner': 'Weather Prophet',
-    'start_date': days_ago
+    'start_date': days_ago(2)
 }
 
 dag = DAG(
@@ -23,7 +24,7 @@ dag = DAG(
 )
 
 # Load subscribers
-with open('subscribers.json') as f:
+with open(os.path.dirname(os.path.abspath(__file__)) + '/subscribers.json') as f:
     subscribers = json.load(f)
 
 # Action at exit

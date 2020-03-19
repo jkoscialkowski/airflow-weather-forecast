@@ -1,4 +1,5 @@
 import json
+import os
 import pandas as pd
 import requests
 
@@ -43,7 +44,7 @@ class Meteo:
 
 meteo = Meteo()
 env = Environment(
-    loader=FileSystemLoader('.'),
+    loader=FileSystemLoader(os.path.dirname(os.path.abspath(__file__))),
     autoescape=select_autoescape(['html'])
 )
 template = env.get_template('mail_template.html')
